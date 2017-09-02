@@ -55,21 +55,27 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :return: The Tensor for the last layer of output
     """
     # TODO: Implement function
-    conv7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, 1, 'SAME', 
+    conv7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, 1, 'SAME',
+                             kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
                              kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
     conv4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, 1, 'SAME',
+                             kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
                              kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
     
     conv3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, 1, 'SAME',
+                             kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
                              kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     out = tf.layers.conv2d_transpose(conv7, num_classes, 4, 2, 'SAME',
+                                     kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
                                      kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
     out = tf.add(out, conv4)
     out = tf.layers.conv2d_transpose(out, num_classes, 4, 2, 'SAME',
+                                     kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
                                      kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
     out = tf.add(out, conv3)
     out = tf.layers.conv2d_transpose(out, num_classes, 16, 8, 'SAME',
+                                     kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
                                      kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
     return out
 tests.test_layers(layers)
@@ -118,7 +124,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
                 input_image: x, 
                 correct_label: y, 
                 keep_prob: 0.5,
-                learning_rate: 0.001
+                learning_rate: 1e-4
             })
             print("epoch: {0}, batch: {1}, loss: {2}".format(epoch, i, loss))
           
@@ -160,7 +166,7 @@ def run():
         # TODO: Train NN using the train_nn function
         sess.run(tf.global_variables_initializer())
 
-        train_nn(sess, 10, 4, get_batches_fn, train_op, loss, 
+        train_nn(sess, 20, 4, get_batches_fn, train_op, loss, 
                  input_image, label, keep_prob, learning_rate)
         # TODO: Save inference data using helper.save_inference_samples
         helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
